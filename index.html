@@ -50,7 +50,7 @@ const CH=[
 ].map(c=>({...c,bank:null,img:null}));
 const dec=u=>{try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch{return new TextDecoder('shift_jis').decode(u)}};
 const st=m=>$('#sb').textContent=m;
-function renderChars(){$('#chars').innerHTML=CH.map((c,i)=>`<div class="ch bv${i==cur?' on':''}" data-i="${i}"><img src="${c.img||face(c.c)}"><br>${c.n}<br><small>${c.bank?Object.keys(c.bank.oto).length+' samples':'built-in synth'}</small></div>`).join('');
+function renderChars(){$('#chars').innerHTML=CH.map((c,i)=>`<div class="ch bv${i==cur?' on':''}" data-i="${i}"><img src="${c.img||face(c.c)}"><br>${c.n}<br><small>${c.bank?Object.keys(c.bank.oto).length+' samples':(c.err||'built-in synth')}</small></div>`).join('');
 document.querySelectorAll('.ch').forEach(e=>e.onclick=()=>{cur=+e.dataset.i;renderChars();info(cur)})}
 function info(i){const c=CH[i];$('#dl').style.display='block';$('#dl').innerHTML=`<div class="tb"><span>${c.n} - Profile</span><button id="x">×</button></div><div class="bd"><img src="${c.img||face(c.c)}"><div><p><b>${c.n}</b><br>${c.en}</p>${c.info.map(t=>`<p>${t}</p>`).join('')}<p>Voicebank: ${c.bank?'loaded ('+Object.keys(c.bank.oto).length+' samples)':'not loaded (built-in synth)'}</p><button id="lb">Load voicebank .zip...</button><input id="zf" type="file" accept=".zip" hidden></div></div>`;
 $('#x').onclick=()=>$('#dl').style.display='none';$('#lb').onclick=()=>$('#zf').click();$('#zf').onchange=e=>e.target.files[0]&&loadBank(i,e.target.files[0])}
@@ -61,7 +61,7 @@ for(const[p,e]of Object.entries(z.files)){if(e.dir||!/oto\.ini$/i.test(p))contin
 for(const l of dec(await e.async('uint8array')).split(/\r?\n/)){const m=l.match(/^(.+?\.wav)=(.*)$/i);if(!m)continue;const a=m[2].split(',');const al=a[0]||m[1].replace(/\.wav$/i,'');
 if(!oto[al])oto[al]={f:(dir+m[1]).replace(/\\/g,'/').toLowerCase(),o:+a[1]||0,c:+a[2]||0,u:+a[3]||0,p:+a[4]||0}}}
 if(!Object.keys(oto).length)throw'no oto.ini found in zip';
-c.bank={z,oto,lc,cache:{},m:{}};if(img)c.img=img;renderChars();if(quiet!==1)info(i);st(c.n+': loaded '+Object.keys(oto).length+' samples')}catch(x){st('Load failed: '+x)}}
+c.bank={z,oto,lc,cache:{},m:{}};if(img)c.img=img;renderChars();if(quiet!==1)info(i);st(c.n+': loaded '+Object.keys(oto).length+' samples')}catch(x){st('Load failed: '+x);c.err='failed: '+x;renderChars()}}
 const KR='a i u e o ka ki ku ke ko sa shi su se so ta chi tsu te to na ni nu ne no ha hi fu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo n ga gi gu ge go za ji zu ze zo da di du de do ba bi bu be bo pa pi pu pe po kya kyu kyo sha shu sho cha chu cho nya nyu nyo hya hyu hyo mya myu myo rya ryu ryo gya gyu gyo ja ju jo bya byu byo pya pyu pyo'.split(' '),KH=[...'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ',...'きゃきゅきょしゃしゅしょちゃちゅちょにゃにゅにょひゃひゅひょみゃみゅみょりゃりゅりょぎゃぎゅぎょじゃじゅじょびゃびゅびょぴゃぴゅぴょ'.match(/../g)],k2r={},r2k={si:'し',ti:'ち',tu:'つ',hu:'ふ',zi:'じ'};KH.forEach((k,i)=>{k2r[k]=KR[i];r2k[KR[i]]=k});
 const kata=s=>[...s].map(c=>{const k=c.codePointAt(0);return k>=0x3041&&k<=0x3096?String.fromCodePoint(k+96):c}).join('');
 const cands=ly=>{const h=hira(ly),r=k2r[h],k=r2k[ly.toLowerCase()];return [...new Set([ly,h,kata(h),r,k,k&&kata(k)].filter(Boolean))]};
@@ -131,5 +131,5 @@ else r=mxml(dec(new Uint8Array(await f.arrayBuffer())));
 notes=mono(r.notes);if(r.tempo){tempo=Math.round(r.tempo);$('#tp').value=tempo}sel=null;draw();if(notes.length){const sc=$('#sc');sc.scrollLeft=Math.max(0,notes[0].t*px-20);sc.scrollTop=(HI-1-Math.max(...notes.map(n=>n.n)))*RH-40}
 st(f.name+': '+notes.length+' notes (made monophonic)')}catch(x){st('Import failed: '+x)}e.target.value=''};
 keys();renderChars();draw();
-['teto','kotone','defoko'].forEach(async(f,i)=>{try{const r=await fetch('voicebanks/'+f+'.zip');if(r.ok)await loadBank(i,await r.arrayBuffer(),1)}catch{}});$('#sc').scrollTop=(HI-1-72)*RH;
+['teto','kotone','defoko'].forEach(async(f,i)=>{CH[i].err='loading...';renderChars();try{const r=await fetch('voicebanks/'+f+'.zip');if(!r.ok){CH[i].err='not found (HTTP '+r.status+')';renderChars();return}CH[i].err='unpacking...';renderChars();await loadBank(i,await r.arrayBuffer(),1);renderChars()}catch(x){CH[i].err='error: '+x;renderChars()}});$('#sc').scrollTop=(HI-1-72)*RH;
 </script></body></html>
