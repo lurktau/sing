@@ -45,7 +45,7 @@ let notes=[],tempo=120,snap=120,px=.1,sel=null,cur=0,AC=null,run=null,t0=0,drag=
 const face=(c,h)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><rect width="80" height="100" fill="#dde"/><circle cx="40" cy="48" r="22" fill="#fde"/><path d="M16 56Q16 14 40 14Q64 14 64 56L58 56Q56 30 40 30Q24 30 22 56Z" fill="${c}"/><circle cx="31" cy="50" r="3" fill="#333"/><circle cx="49" cy="50" r="3" fill="#333"/><path d="M34 60Q40 64 46 60" stroke="#a55" fill="none"/><text x="40" y="94" font-size="9" text-anchor="middle" fill="#555">NO IMAGE</text></svg>`);
 const CH=[
 {n:'Kasane Teto',en:'重音テト',c:'#d8323c',info:['UTAU voicebank character. She began as a fake "Vocaloid" hoax posted on 2channel on April Fools’ Day 2008, and a real voicebank was made for her afterwards.','Her official age is a famously permanent 31. Red drill twintails and baguettes are her trademarks.','Note: this profile is a short summary written from memory.']},
-{n:'Koto Fuuga',en:'Koto Fuuga',c:'#35508f',info:['Load this character’s voicebank zip to use the voice.','I could not verify details about this character, so the profile is mostly blank. You can edit it in the CH list in the source.']},
+{n:'Tsuru Kotone',en:'Tsuru Kotone',c:'#2f9a8f',info:['Load this character’s voicebank zip to use the voice.','I could not verify details about this character, so the profile is mostly blank. You can edit it in the CH list in the source.']},
 {n:'Defoko',en:'Utane Uta (唄音ウタ)',c:'#f08ab0',info:['Nicknamed Defoko (from “default”), she is the character known as UTAU’s default voice.','Note: this profile is a short summary written from memory.']}
 ].map(c=>({...c,bank:null,img:null}));
 const dec=u=>{try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch{return new TextDecoder('shift_jis').decode(u)}};
@@ -131,5 +131,5 @@ else r=mxml(dec(new Uint8Array(await f.arrayBuffer())));
 notes=mono(r.notes);if(r.tempo){tempo=Math.round(r.tempo);$('#tp').value=tempo}sel=null;draw();if(notes.length){const sc=$('#sc');sc.scrollLeft=Math.max(0,notes[0].t*px-20);sc.scrollTop=(HI-1-Math.max(...notes.map(n=>n.n)))*RH-40}
 st(f.name+': '+notes.length+' notes (made monophonic)')}catch(x){st('Import failed: '+x)}e.target.value=''};
 keys();renderChars();draw();
-['teto','fuuga','defoko'].forEach(async(f,i)=>{try{const r=await fetch('voicebanks/'+f+'.zip');if(r.ok)await loadBank(i,await r.arrayBuffer(),1)}catch{}});$('#sc').scrollTop=(HI-1-72)*RH;
+['teto','kotone','defoko'].forEach(async(f,i)=>{try{const r=await fetch('voicebanks/'+f+'.zip');if(r.ok)await loadBank(i,await r.arrayBuffer(),1)}catch{}});$('#sc').scrollTop=(HI-1-72)*RH;
 </script></body></html>
