@@ -1,58 +1,68 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>SINGER-98 Vocal Synth Editor</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Kotone Studio - Vocal Synth Editor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
-:root{color-scheme:light;--f:"MS Gothic","MS PGothic","Osaka-Mono","IPAGothic",monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{height:100%;margin:0}
-body{background:#008080;font:12px var(--f);color:#000;display:flex;flex-direction:column;-webkit-font-smoothing:none}
-button,select,input{font:12px var(--f);color:#000}
-button,.bv{background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff}
-button{padding:2px 8px;cursor:pointer}button:active{border-color:#404040 #fff #fff #404040}
-input,select{border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff}
-#win{flex:1;margin:6px;display:flex;flex-direction:column;min-height:0;padding:2px}
-.tb{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;padding:2px 4px;display:flex;justify-content:space-between;align-items:center}
-.tb button{padding:0 6px;line-height:14px}
-#bar{padding:4px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;border-bottom:2px groove #fff}
-#bar input[type=number]{width:52px}#ly{width:60px}
-#main{flex:1;display:flex;min-height:0;gap:2px;padding:2px}
-#chars{width:150px;overflow:auto;padding:4px;display:flex;flex-direction:column;gap:6px;background:#c0c0c0}
-.ch{padding:4px;cursor:pointer;text-align:center}.ch.on{background:#000080;color:#fff}
-.ch img{width:80px;height:100px;object-fit:cover;border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff}
-#roll{flex:1;display:flex;min-width:0;border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff}
-#keys{width:48px;overflow:hidden;flex:none}
-#sc{flex:1;overflow:auto;position:relative}
+body{font:11px Tahoma,"Segoe UI",Verdana,sans-serif;color:#000;display:flex;flex-direction:column;background:radial-gradient(ellipse 130% 55% at 25% 108%,#5aa52e 62%,transparent 63%),radial-gradient(ellipse 120% 45% at 95% 112%,#3f8a22 62%,transparent 63%),linear-gradient(#2b6fd6,#7db6f2 62%,#bfe0fa)}
+#desk{flex:1;display:flex;min-height:0;padding:10px 10px 6px;gap:10px}
+#win,#dl{background:#ece9d8;border:3px solid #0850dc;border-top:0;border-radius:8px 8px 0 0;box-shadow:2px 3px 8px rgba(0,0,0,.45)}
+#win{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.tb{background:linear-gradient(#0997ff,#0053ee 8%,#0050ee 40%,#06f 88%,#06f 93%,#005bff 95%,#003dd7);color:#fff;font:bold 13px "Trebuchet MS",Tahoma,sans-serif;text-shadow:1px 1px #0f1089;height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 8px;margin:0 -3px;border-radius:8px 8px 0 0;flex:none}
+.cb,.tb button{display:inline-block;width:21px;height:21px;min-width:0;padding:0;border:1px solid #fff;border-radius:3px;background:#2a62e0;color:#fff;text-align:center;line-height:19px;margin-left:2px;font:bold 12px Tahoma;box-sizing:border-box}
+.cb.x,.tb button{background:#d6502f}
+button{font:11px Tahoma,"Segoe UI",sans-serif;color:#000;padding:3px 10px;border:1px solid #003c74;border-radius:3px;background:linear-gradient(#fff,#ecebe5 86%,#d8d0c4);cursor:pointer}
+button:hover{box-shadow:inset 0 0 0 2px #fbc761}button:active{background:#d8d0c4}
+input,select{font:11px Tahoma,sans-serif;border:1px solid #7f9db9;background:#fff;padding:2px;color:#000}
+#bar{padding:5px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;border-bottom:1px solid #aca899;flex:none}
+#bar input[type=number]{width:48px}#ly{width:56px}
+.sunk{border:1px solid #919b9c;background:#fffff0;margin:3px 4px 0;padding:2px 4px;color:#003399;flex:none}
+#main{flex:1;display:flex;min-height:0;gap:4px;padding:4px}
+#chars{width:132px;flex:none;overflow:auto;border:1px solid #919b9c;background:#fff;padding:4px}
+.ch{padding:4px;cursor:pointer;text-align:center;border:1px solid #d4d0c8}.ch.on{background:#316ac5;color:#fff}
+.ch img{width:100%;height:150px;object-fit:cover;object-position:top;background:#dde}
+#roll{flex:1;display:flex;min-width:0;border:1px solid #7f9db9;background:#fff}
+#keys{width:48px;overflow:hidden;flex:none}#sc{flex:1;overflow:auto;position:relative}
 #wrap{position:relative}#ph{position:absolute;top:0;bottom:0;width:1px;background:red;left:0;pointer-events:none}
-#sb{padding:2px 6px;border:2px solid;border-color:#808080 #fff #fff #808080;margin:2px}
-#dl{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,92vw);padding:2px;z-index:9;box-shadow:4px 4px 0 #000}
-#dl .bd{padding:8px;display:flex;gap:10px}#dl img{width:120px;height:150px;object-fit:cover;border:2px inset #fff;background:#fff}
-#dl p{margin:0 0 6px;line-height:1.5}
+#sb{padding:3px 6px;border-top:1px solid #aca899;flex:none}
+#fig{width:clamp(0px,26vw,340px);flex:none;pointer-events:none}
+#fig img{width:100%;height:100%;object-fit:contain;object-position:bottom;opacity:.95;filter:drop-shadow(2px 3px 4px rgba(0,0,0,.35))}
+@media(max-width:800px){#fig{display:none}}
+#dl{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,92vw);z-index:9}
+#dl .bd{padding:8px;display:flex;gap:10px}#dl img{width:120px;height:170px;object-fit:cover;object-position:top;border:1px solid #7f9db9;background:#fff}
+#dl p{margin:0 0 6px;line-height:1.45}
+#task{height:30px;flex:none;display:flex;align-items:center;gap:6px;background:linear-gradient(#245edb,#3f8cf3 9%,#245edb 18%,#245edb 92%,#1941a5)}
+#task .st{height:100%;padding:0 18px 0 10px;border:0;border-radius:0 10px 10px 0;background:linear-gradient(#3c9a3c,#5cc65c 12%,#3c9a3c 45%,#2f8a2f);color:#fff;font:italic bold 15px "Trebuchet MS",sans-serif;text-shadow:1px 1px #1a4a1a}
+#task .tbtn{background:#1e52c0;border:1px solid #0b3a9a;border-radius:3px;color:#fff;padding:4px 14px;min-width:150px}
+#task .tray{margin-left:auto;height:100%;display:flex;align-items:center;padding:0 12px;gap:10px;color:#fff;background:linear-gradient(#0f9bef,#1290e6 10%,#0b78d0);border-left:1px solid #0b3a9a}
 </style></head><body>
-<div id="win" class="bv"><div class="tb"><span>SINGER-98 - Vocal Synth Editor Ver 0.2</span><span>_ □ ×</span></div>
+<div id="desk"><div id="win"><div class="tb"><span>Kotone Studio - Vocal Synth Editor</span><span><span class="cb">_</span><span class="cb">&#9633;</span><span class="cb x">x</span></span></div>
 <div id="bar">
 <button id="bo">Open...</button><input id="fi" type="file" accept=".mid,.midi,.ust,.xml,.musicxml,.mxl" hidden>
-<button id="bp">▶ Play</button><button id="bs">■ Stop</button>
-Tempo<input id="tp" type="number" value="120" min="30" max="300">
-Snap<select id="sn"><option value="480">1/4</option><option value="240">1/8</option><option value="120" selected>1/16</option><option value="60">1/32</option></select>
-Lyric<input id="ly" value="a">Vol<input id="vl" type="number" value="100" min="0" max="200" style="width:52px">
-<button id="zi">Zoom +</button><button id="zo">Zoom -</button><button id="cl">Clear all</button><button id="hp">Help</button>
+<button id="bp">&#9654; Play</button><button id="bs">&#9632; Stop</button>
+Tempo <input id="tp" type="number" value="120" min="30" max="300">
+Snap <select id="sn"><option value="480">1/4</option><option value="240">1/8</option><option value="120" selected>1/16</option><option value="60">1/32</option></select>
+Lyric <input id="ly" value="a"> Vol <input id="vl" type="number" value="100" min="0" max="200">
+Base pitch <select id="bn" title="If the singing sounds off-key, try other values here"></select>
+<button id="zi">Zoom +</button><button id="zo">Zoom -</button><button id="cl">Clear all</button><button id="bz">Voicebank...</button><input id="zf2" type="file" accept=".zip" hidden><button id="hp">Help</button>
 </div>
-<div id="main"><div id="chars" class="bv"></div>
+<div class="sunk"><marquee scrollamount="3">~*~ Welcome to Kotone Studio ~*~ click the piano roll to add a note ~*~ right-click to delete ~*~ double-click to change the lyric ~*~ open a .ust, .mid or MusicXML file to begin ~*~</marquee></div>
+<div id="main"><div id="chars"></div>
 <div id="roll"><div id="keys"><canvas id="kc"></canvas></div><div id="sc"><div id="wrap"><canvas id="cv"></canvas><div id="ph"></div></div></div></div></div>
 <div id="sb">Ready</div></div>
-<div id="dl" class="bv"></div>
+<div id="fig"><img src="https://static.vocadb.net/img/Artist/mainOrig/36314.png?v=7" alt="" onerror="this.style.display='none'"></div></div>
+<div id="task"><button class="st">start</button><div class="tbtn">Kotone Studio</div><div class="tray"><span>Best viewed at 1024x768</span><span id="clk"></span></div></div>
+<div id="dl"></div>
 <script>
 const $=s=>document.querySelector(s),TPQ=480,LO=24,HI=108,RH=12;
-let notes=[],tempo=120,snap=120,px=.1,sel=null,cur=0,AC=null,run=null,t0=0,drag=null,END=0;
+let notes=[],tempo=120,snap=120,px=.1,sel=null,cur=0,AC=null,run=null,t0=0,drag=null,END=0,baseHz=0;
 const face=(c,h)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><rect width="80" height="100" fill="#dde"/><circle cx="40" cy="48" r="22" fill="#fde"/><path d="M16 56Q16 14 40 14Q64 14 64 56L58 56Q56 30 40 30Q24 30 22 56Z" fill="${c}"/><circle cx="31" cy="50" r="3" fill="#333"/><circle cx="49" cy="50" r="3" fill="#333"/><path d="M34 60Q40 64 46 60" stroke="#a55" fill="none"/><text x="40" y="94" font-size="9" text-anchor="middle" fill="#555">NO IMAGE</text></svg>`);
-const CH=[
-{n:'Kasane Teto',en:'重音テト',c:'#d8323c',info:['UTAU voicebank character. She began as a fake "Vocaloid" hoax posted on 2channel on April Fools’ Day 2008, and a real voicebank was made for her afterwards.','Her official age is a famously permanent 31. Red drill twintails and baguettes are her trademarks.','Note: this profile is a short summary written from memory.']},
-{n:'Tsuru Kotone',en:'Tsuru Kotone',c:'#2f9a8f',info:['Load this character’s voicebank zip to use the voice.','I could not verify details about this character, so the profile is mostly blank. You can edit it in the CH list in the source.']},
-{n:'Defoko',en:'Utane Uta (唄音ウタ)',c:'#f08ab0',info:['Nicknamed Defoko (from “default”), she is the character known as UTAU’s default voice.','Note: this profile is a short summary written from memory.']}
-].map(c=>({...c,bank:null,img:null}));
+const FIG='https://static.vocadb.net/img/Artist/mainOrig/36314.png?v=7',med=a=>a.sort((x,y)=>x-y)[a.length>>1];
+const CH=[{n:'Tsuru Kotone',en:'Tsuru Kotone',c:'#2f9a8f',info:['Her voicebank (voicebanks/kotone.zip) is loaded automatically when the page opens.','Profile details have not been added yet.'],bank:null,img:null}];
 const dec=u=>{try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch{return new TextDecoder('shift_jis').decode(u)}};
 const st=m=>$('#sb').textContent=m;
-function renderChars(){$('#chars').innerHTML=CH.map((c,i)=>`<div class="ch bv${i==cur?' on':''}" data-i="${i}"><img src="${c.img||face(c.c)}"><br>${c.n}<br><small>${c.bank?Object.keys(c.bank.oto).length+' samples':(c.err||'built-in synth')}</small></div>`).join('');
+function renderChars(){$('#chars').innerHTML=CH.map((c,i)=>`<div class="ch bv${i==cur?' on':''}" data-i="${i}"><img src="${c.img||FIG}" onerror="this.onerror=null;this.src=face('#2f9a8f')"><br>${c.n}<br><small>${c.bank?Object.keys(c.bank.oto).length+' samples':(c.err||'built-in synth')}</small></div>`).join('');
 document.querySelectorAll('.ch').forEach(e=>e.onclick=()=>{cur=+e.dataset.i;renderChars();info(cur)})}
-function info(i){const c=CH[i];$('#dl').style.display='block';$('#dl').innerHTML=`<div class="tb"><span>${c.n} - Profile</span><button id="x">×</button></div><div class="bd"><img src="${c.img||face(c.c)}"><div><p><b>${c.n}</b><br>${c.en}</p>${c.info.map(t=>`<p>${t}</p>`).join('')}<p>Voicebank: ${c.bank?'loaded ('+Object.keys(c.bank.oto).length+' samples)':'not loaded (built-in synth)'}</p><button id="lb">Load voicebank .zip...</button><input id="zf" type="file" accept=".zip" hidden></div></div>`;
+function info(i){const c=CH[i];$('#dl').style.display='block';$('#dl').innerHTML=`<div class="tb"><span>${c.n} - Profile</span><button id="x">×</button></div><div class="bd"><img src="${c.img||FIG}" onerror="this.onerror=null;this.src=face('#2f9a8f')"><div><p><b>${c.n}</b><br>${c.en}</p>${c.info.map(t=>`<p>${t}</p>`).join('')}<p>Voicebank: ${c.bank?'loaded ('+Object.keys(c.bank.oto).length+' samples)':'not loaded (built-in synth)'}</p><button id="lb">Load voicebank .zip...</button><input id="zf" type="file" accept=".zip" hidden></div></div>`;
 $('#x').onclick=()=>$('#dl').style.display='none';$('#lb').onclick=()=>$('#zf').click();$('#zf').onchange=e=>e.target.files[0]&&loadBank(i,e.target.files[0])}
 async function loadBank(i,file,quiet){const c=CH[i];st('Loading voicebank...');try{const z=await JSZip.loadAsync(file,{decodeFileName:b=>{try{return new TextDecoder('utf-8',{fatal:true}).decode(new Uint8Array(b))}catch{return new TextDecoder('shift_jis').decode(new Uint8Array(b))}}}),oto={},lc={};let img=null;
 for(const[p,e]of Object.entries(z.files)){if(e.dir)continue;const l=p.toLowerCase();lc[l]=p;
@@ -64,7 +74,7 @@ if(!Object.keys(oto).length)throw'no oto.ini found in zip';
 c.bank={z,oto,lc,cache:{},m:{}};if(img)c.img=img;renderChars();if(quiet!==1)info(i);st(c.n+': loaded '+Object.keys(oto).length+' samples')}catch(x){st('Load failed: '+x);c.err='failed: '+x;renderChars()}}
 const KR='a i u e o ka ki ku ke ko sa shi su se so ta chi tsu te to na ni nu ne no ha hi fu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo n ga gi gu ge go za ji zu ze zo da di du de do ba bi bu be bo pa pi pu pe po kya kyu kyo sha shu sho cha chu cho nya nyu nyo hya hyu hyo mya myu myo rya ryu ryo gya gyu gyo ja ju jo bya byu byo pya pyu pyo'.split(' '),KH=[...'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ',...'きゃきゅきょしゃしゅしょちゃちゅちょにゃにゅにょひゃひゅひょみゃみゅみょりゃりゅりょぎゃぎゅぎょじゃじゅじょびゃびゅびょぴゃぴゅぴょ'.match(/../g)],k2r={},r2k={si:'し',ti:'ち',tu:'つ',hu:'ふ',zi:'じ'};KH.forEach((k,i)=>{k2r[k]=KR[i];r2k[KR[i]]=k});
 const kata=s=>[...s].map(c=>{const k=c.codePointAt(0);return k>=0x3041&&k<=0x3096?String.fromCodePoint(k+96):c}).join('');
-const cands=ly=>{const h=hira(ly),r=k2r[h],k=r2k[ly.toLowerCase()];return [...new Set([ly,h,kata(h),r,k,k&&kata(k)].filter(Boolean))]};
+const cands=l0=>{const ly=l0.trim().split(/\s+/).pop()||l0,h=hira(ly),r=k2r[h],k=r2k[ly.toLowerCase()];return [...new Set([l0,ly,h,kata(h),r,k,k&&kata(k)].filter(Boolean))]};
 const hira=s=>[...s].map(c=>{const k=c.codePointAt(0);return k>=0x30a1&&k<=0x30f6?String.fromCodePoint(k-96):c}).join('');
 function look(b,ly){if(ly in b.m)return b.m[ly];const C=cands(ly);let e=null;for(const k of C.flatMap(x=>[x,'- '+x]))if(b.oto[k]){e=b.oto[k];break}
 if(!e){const a=Object.keys(b.oto).find(a=>C.some(x=>a.endsWith(' '+x)));if(a)e=b.oto[a]}return b.m[ly]=e}
@@ -74,9 +84,11 @@ function f0(buf,t){const d=buf.getChannelData(0),sr=buf.sampleRate,N=1024,mx=Mat
 for(let L=Math.floor(sr/700);L<mx;L++){let a=0,b=0,c=0;for(let i=0;i<N;i++){const x=d[s+i],y=d[s+i+L];a+=x*y;b+=x*x;c+=y*y}const r=a/Math.sqrt(b*c+1e-9);R[L]=r;if(r>best)best=r}
 for(let L=Math.floor(sr/700);L<mx;L++)if(R[L]>=.93*best)return sr/L;return 261.6}
 async function prep(){const b=CH[cur].bank;if(!b)return;for(const n of notes){const e=look(b,n.ly);if(!e||e.buf)continue;const p=b.lc[e.f]||e.f,f=b.z.file(p);if(!f){b.m[n.ly]=null;continue}
-try{if(!b.cache[p])b.cache[p]=await AC.decodeAudioData(await f.async('arraybuffer'));e.buf=b.cache[p];const end=Math.min(e.buf.duration,e.u<0?(e.o-e.u)/1e3:e.buf.duration-e.u/1e3),a=e.o/1e3+e.c/1e3;e.end=end;e.hz=f0(e.buf,a+.3*(end-a))}catch{b.m[n.ly]=null}}}
+try{if(!b.cache[p])b.cache[p]=await AC.decodeAudioData(await f.async('arraybuffer'));e.buf=b.cache[p];const end=Math.min(e.buf.duration,e.u<0?(e.o-e.u)/1e3:e.buf.duration-e.u/1e3),a=e.o/1e3+e.c/1e3;e.end=end;e.hz=med([.15,.3,.45,.6,.75].map(q=>f0(e.buf,a+q*(end-a))))}catch{b.m[n.ly]=null}}}
 function sched(w){const out=[],b=CH[cur].bank,now=AC.currentTime;for(const n of notes){const sec=60/(tempo*TPQ),st=w+n.t*sec,en=st+n.l*sec,hz=440*2**((n.n-69)/12),g=AC.createGain(),e=b&&look(b,n.ly),vol=n.v/100*(e&&e.buf?.7:2.5);g.connect(AC.destination);let s0=st;
-if(e&&e.buf){const o=e.o/1e3,r=Math.max(.2,Math.min(5,hz/e.hz)),s=AC.createBufferSource(),a=o+e.c/1e3,ls=a+.4*(e.end-a);s.buffer=e.buf;s.playbackRate.value=r;s.loop=e.end-ls>.03;s.loopStart=ls;s.loopEnd=e.end;s.connect(g);s0=Math.max(now,st-e.p/1e3/r);s.start(s0,o);s.stop(en+.08);out.push(s)}
+if(e&&e.buf){const o=e.o/1e3,c=e.c/1e3,p=e.p/1e3,r=Math.max(.2,Math.min(5,hz/(baseHz||e.hz))),a=o+c,ls=a+.4*(e.end-a);s0=Math.max(now,st-p);
+const vs=AC.createBufferSource(),vg=AC.createGain(),vt=Math.max(s0,st+c-p);vs.buffer=e.buf;vs.playbackRate.value=r;vs.loop=e.end-ls>.03;vs.loopStart=ls;vs.loopEnd=e.end;vs.connect(vg);vg.connect(g);vg.gain.setValueAtTime(0,vt);vg.gain.linearRampToValueAtTime(1,vt+.015);vs.start(vt,a);vs.stop(en+.08);out.push(vs);
+if(c>.005){const cs=AC.createBufferSource(),cg=AC.createGain();cs.buffer=e.buf;cs.connect(cg);cg.connect(g);cg.gain.setValueAtTime(1,s0);cg.gain.setValueAtTime(1,vt);cg.gain.linearRampToValueAtTime(0,vt+.015);cs.start(s0,o,c+.02);out.push(cs)}}
 else if(!b){const o=AC.createOscillator();o.type='sawtooth';o.frequency.value=hz;for(const fr of VF[vow(n.ly)]){const q=AC.createBiquadFilter();q.type='bandpass';q.frequency.value=fr;q.Q.value=8;o.connect(q);q.connect(g)}o.start(st);o.stop(en+.08);out.push(o)}
 g.gain.setValueAtTime(0,s0);g.gain.linearRampToValueAtTime(vol,Math.max(s0,st)+.01);g.gain.setValueAtTime(vol,en);g.gain.linearRampToValueAtTime(0,en+.06)}return out}
 async function play(){stop();AC=AC||new AudioContext();await AC.resume();st('Loading samples...');await prep();const bk=CH[cur].bank,ms=bk?[...new Set(notes.filter(n=>{const e=look(bk,n.ly);return !e||!e.buf}).map(n=>n.ly))]:[];END=Math.max(0,...notes.map(n=>n.t+n.l));t0=AC.currentTime+.2;run=sched(t0);st('Playing: '+CH[cur].n+(ms.length?' | no sample found for: '+ms.slice(0,12).join(', '):''));loop()}
@@ -86,7 +98,7 @@ const cv=$('#cv'),g2=cv.getContext('2d');
 function draw(){const W=Math.ceil(Math.max(48*4*TPQ,Math.max(0,...notes.map(n=>n.t+n.l))+4*4*TPQ)*px),H=(HI-LO)*RH;if(cv.width!=W)cv.width=W;cv.height=H;$('#wrap').style.width=W+'px';
 for(let n=LO;n<HI;n++){const y=(HI-1-n)*RH,bk=[1,3,6,8,10].includes(n%12);g2.fillStyle=bk?'#d4d4e0':'#fff';g2.fillRect(0,y,W,RH);g2.fillStyle=n%12==0?'#808080':'#e0e0e0';g2.fillRect(0,y+RH-1,W,1)}
 for(let t=0,i=0;t*px<W;t+=TPQ,i++){g2.fillStyle=i%4==0?'#606060':'#b0b0b0';g2.fillRect(Math.round(t*px),0,1,H);if(i%4==0){g2.fillStyle='#000';g2.font='10px monospace';g2.fillText(i/4+1,t*px+2,9)}}
-for(const n of notes){const x=n.t*px,y=(HI-1-n.n)*RH,w=Math.max(2,n.l*px);g2.fillStyle=n==sel?'#ffff00':'#00b050';g2.fillRect(x,y,w,RH-1);g2.strokeStyle='#000';g2.strokeRect(x+.5,y+.5,w-1,RH-2);g2.fillStyle='#000';g2.font='11px "MS Gothic",monospace';g2.fillText(n.ly,x+3,y+10)}}
+for(const n of notes){const x=n.t*px,y=(HI-1-n.n)*RH,w=Math.max(2,n.l*px);g2.fillStyle=n==sel?'#ffd84a':'#3a78d8';g2.fillRect(x,y,w,RH-1);g2.strokeStyle='#000';g2.strokeRect(x+.5,y+.5,w-1,RH-2);g2.fillStyle=n==sel?'#000':'#fff';g2.font='11px Tahoma,sans-serif';g2.fillText(n.ly,x+3,y+10)}}
 function keys(){const k=$('#kc'),c=k.getContext('2d');k.width=48;k.height=(HI-LO)*RH;for(let n=LO;n<HI;n++){const y=(HI-1-n)*RH,bk=[1,3,6,8,10].includes(n%12);c.fillStyle=bk?'#000':'#fff';c.fillRect(0,y,48,RH);c.strokeStyle='#808080';c.strokeRect(.5,y+.5,47,RH-1);if(n%12==0){c.fillStyle='#000';c.font='10px monospace';c.fillText('C'+(n/12-1),26,y+10)}}}
 const clash=n=>notes.some(m=>m!==n&&n.t<m.t+m.l&&m.t<n.t+n.l),pos=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]},at=(t,nn)=>notes.find(m=>t>=m.t&&t<m.t+m.l&&m.n==nn);
 cv.onmousedown=e=>{if(e.button)return;const[x,y]=pos(e),t=x/px,nn=HI-1-Math.floor(y/RH);let n=at(t,nn),mode='m';
@@ -131,5 +143,13 @@ else r=mxml(dec(new Uint8Array(await f.arrayBuffer())));
 notes=mono(r.notes);if(r.tempo){tempo=Math.round(r.tempo);$('#tp').value=tempo}sel=null;draw();if(notes.length){const sc=$('#sc');sc.scrollLeft=Math.max(0,notes[0].t*px-20);sc.scrollTop=(HI-1-Math.max(...notes.map(n=>n.n)))*RH-40}
 st(f.name+': '+notes.length+' notes (made monophonic)')}catch(x){st('Import failed: '+x)}e.target.value=''};
 keys();renderChars();draw();
-['teto','kotone','defoko'].forEach(async(f,i)=>{CH[i].err='loading...';renderChars();try{const r=await fetch('voicebanks/'+f+'.zip');if(!r.ok){CH[i].err='not found (HTTP '+r.status+')';renderChars();return}CH[i].err='unpacking...';renderChars();await loadBank(i,await r.arrayBuffer(),1);renderChars()}catch(x){CH[i].err='error: '+x;renderChars()}});$('#sc').scrollTop=(HI-1-72)*RH;
+(async()=>{const c=CH[0];c.err='downloading...';renderChars();try{const r=await fetch('voicebanks/kotone.zip');if(!r.ok){c.err='zip not found (HTTP '+r.status+')';renderChars();st('Could not find voicebanks/kotone.zip - use the Voicebank... button instead.');return}
+const bl=await r.blob(),h=new Uint8Array(await bl.slice(0,4).arrayBuffer());if(h[0]!=80||h[1]!=75){c.err='not a zip ('+bl.size+' bytes)';renderChars();return}
+c.err='unpacking '+Math.round(bl.size/1048576)+' MB...';renderChars();await loadBank(0,new File([bl],'kotone.zip'),1);
+if(!c.bank){const e1=c.err;await loadBank(0,new Uint8Array(await bl.arrayBuffer()),1);if(!c.bank)c.err=e1+' | retry: '+c.err}renderChars()}catch(x){c.err='error: '+x;renderChars()}})();
+const NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];$('#bn').innerHTML='<option value="0">Auto</option>'+Array.from({length:37},(_,i)=>{const n=36+i;return `<option value="${n}">${NN[n%12]}${Math.floor(n/12)-1}</option>`}).join('');
+$('#bn').onchange=e=>{const n=+e.target.value;baseHz=n?440*2**((n-69)/12):0};
+$('#bz').onclick=()=>$('#zf2').click();$('#zf2').onchange=e=>e.target.files[0]&&loadBank(0,e.target.files[0]);
+const tick=()=>$('#clk').textContent=new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});tick();setInterval(tick,3e4);
+$('#sc').scrollTop=(HI-1-72)*RH;
 </script></body></html>
