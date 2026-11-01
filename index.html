@@ -1,11 +1,11 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Kotone Studio - Vocal Synth Editor</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Sing XP - Vocal Synthesis System</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{height:100%;margin:0}
-body{font:11px Tahoma,"Segoe UI",Verdana,sans-serif;color:#000;display:flex;flex-direction:column;background:radial-gradient(ellipse 130% 55% at 25% 108%,#5aa52e 62%,transparent 63%),radial-gradient(ellipse 120% 45% at 95% 112%,#3f8a22 62%,transparent 63%),linear-gradient(#2b6fd6,#7db6f2 62%,#bfe0fa)}
+body{font:11px Tahoma,"Segoe UI",Verdana,sans-serif;color:#000;display:flex;flex-direction:column;background:#3a6ea5 url(https://file.garden/ZyUgbYyEhGi7VILo/windowsxplayout/bliss.jpg) center/cover no-repeat fixed}
 #desk{flex:1;display:flex;min-height:0;padding:10px 10px 6px;gap:10px}
-#win,#dl{background:#ece9d8;border:3px solid #0850dc;border-top:0;border-radius:8px 8px 0 0;box-shadow:2px 3px 8px rgba(0,0,0,.45)}
+#win,#dl,#pkw{background:#ece9d8;border:3px solid #0850dc;border-top:0;border-radius:8px 8px 0 0;box-shadow:2px 3px 8px rgba(0,0,0,.45)}
 #win{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
 .tb{background:linear-gradient(#0997ff,#0053ee 8%,#0050ee 40%,#06f 88%,#06f 93%,#005bff 95%,#003dd7);color:#fff;font:bold 13px "Trebuchet MS",Tahoma,sans-serif;text-shadow:1px 1px #0f1089;height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 8px;margin:0 -3px;border-radius:8px 8px 0 0;flex:none}
 .cb,.tb button{display:inline-block;width:21px;height:21px;min-width:0;padding:0;border:1px solid #fff;border-radius:3px;background:#2a62e0;color:#fff;text-align:center;line-height:19px;margin-left:2px;font:bold 12px Tahoma;box-sizing:border-box}
@@ -34,8 +34,16 @@ input,select{font:11px Tahoma,sans-serif;border:1px solid #7f9db9;background:#ff
 #task .st{height:100%;padding:0 18px 0 10px;border:0;border-radius:0 10px 10px 0;background:linear-gradient(#3c9a3c,#5cc65c 12%,#3c9a3c 45%,#2f8a2f);color:#fff;font:italic bold 15px "Trebuchet MS",sans-serif;text-shadow:1px 1px #1a4a1a}
 #task .tbtn{background:#1e52c0;border:1px solid #0b3a9a;border-radius:3px;color:#fff;padding:4px 14px;min-width:150px}
 #task .tray{margin-left:auto;height:100%;display:flex;align-items:center;padding:0 12px;gap:10px;color:#fff;background:linear-gradient(#0f9bef,#1290e6 10%,#0b78d0);border-left:1px solid #0b3a9a}
+[hidden]{display:none!important}
+.sunk{display:flex;align-items:center}.sunk marquee{flex:1}
+.logo{font:italic bold 14px "Trebuchet MS",sans-serif;color:#c00;text-shadow:1px 1px #fc0;margin-right:8px}
+#pkw{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(470px,94vw);height:min(470px,72vh);z-index:8;display:flex;flex-direction:column}
+.pkbar{padding:5px;flex:none}
+#pkl{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;padding:6px;background:#fff;border:1px solid #7f9db9;margin:0 4px 4px;align-content:start}
+.pi{text-align:center;cursor:pointer;border:1px solid #d4d0c8;padding:3px;font-size:10px;text-transform:capitalize}.pi:hover{background:#316ac5;color:#fff}
+.pi img{width:100%;height:110px;object-fit:contain}
 </style></head><body>
-<div id="desk"><div id="win"><div class="tb"><span>Kotone Studio - Vocal Synth Editor</span><span><span class="cb">_</span><span class="cb">&#9633;</span><span class="cb x">x</span></span></div>
+<div id="desk"><div id="win"><div class="tb"><span>Sing XP - Vocal Synthesis System Ver 1.02</span><span><span class="cb">_</span><span class="cb">&#9633;</span><span class="cb x">x</span></span></div>
 <div id="bar">
 <button id="bo">Open...</button><input id="fi" type="file" accept=".mid,.midi,.ust,.xml,.musicxml,.mxl" hidden>
 <button id="bp">&#9654; Play</button><button id="bs">&#9632; Stop</button>
@@ -43,26 +51,27 @@ Tempo <input id="tp" type="number" value="120" min="30" max="300">
 Snap <select id="sn"><option value="480">1/4</option><option value="240">1/8</option><option value="120" selected>1/16</option><option value="60">1/32</option></select>
 Lyric <input id="ly" value="a"> Vol <input id="vl" type="number" value="100" min="0" max="200">
 Base pitch <select id="bn" title="If the singing sounds off-key, try other values here"></select>
-<button id="zi">Zoom +</button><button id="zo">Zoom -</button><button id="cl">Clear all</button><button id="bz">Voicebank...</button><input id="zf2" type="file" accept=".zip" hidden><button id="hp">Help</button>
+<button id="zi">Zoom +</button><button id="zo">Zoom -</button><button id="cl">Clear all</button><button id="bz">Load voicebank .zip</button><input id="zf2" type="file" accept=".zip" hidden><button id="dm">Demo melody</button><button id="im">Image...</button><input id="imf" type="file" accept="image/*" hidden><button id="pk">UTAU gallery...</button><button id="hp">Help</button>
 </div>
-<div class="sunk"><marquee scrollamount="3">~*~ Welcome to Kotone Studio ~*~ click the piano roll to add a note ~*~ right-click to delete ~*~ double-click to change the lyric ~*~ open a .ust, .mid or MusicXML file to begin ~*~</marquee></div>
+<div class="sunk"><b class="logo">Sing XP</b><marquee scrollamount="3">~*~ Welcome to Sing XP - the easy way to make your PC sing! ~*~ Click the piano roll to add a note ~*~ Right-click to delete ~*~ Double-click to change the lyric ~*~ Copyright (C) 2003 Sing Software ~*~</marquee></div>
 <div id="main"><div id="chars"></div>
 <div id="roll"><div id="keys"><canvas id="kc"></canvas></div><div id="sc"><div id="wrap"><canvas id="cv"></canvas><div id="ph"></div></div></div></div></div>
 <div id="sb">Ready</div></div>
-<div id="fig"><img src="https://static.vocadb.net/img/Artist/mainOrig/36314.png?v=7" alt="" onerror="this.style.display='none'"></div></div>
-<div id="task"><button class="st">start</button><div class="tbtn">Kotone Studio</div><div class="tray"><span>Best viewed at 1024x768</span><span id="clk"></span></div></div>
+<div id="fig"><img id="fgi" alt="" hidden></div></div>
+<div id="task"><button class="st">start</button><div class="tbtn">Sing XP</div><div class="tbtn" id="pkb" hidden>UTAU Gallery</div><div class="tray"><span>Best viewed at 1024x768</span><span id="clk"></span></div></div>
 <div id="dl"></div>
+<div id="pkw" hidden><div class="tb"><span>Choose a Singer Image</span><button id="pkx">x</button></div><div class="pkbar">Search: <input id="pks"> <button id="pkc">No image</button></div><div id="pkl"></div></div>
 <script>
 const $=s=>document.querySelector(s),TPQ=480,LO=24,HI=108,RH=12;
 let notes=[],tempo=120,snap=120,px=.1,sel=null,cur=0,AC=null,run=null,t0=0,drag=null,END=0,baseHz=0;
 const face=(c,h)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><rect width="80" height="100" fill="#dde"/><circle cx="40" cy="48" r="22" fill="#fde"/><path d="M16 56Q16 14 40 14Q64 14 64 56L58 56Q56 30 40 30Q24 30 22 56Z" fill="${c}"/><circle cx="31" cy="50" r="3" fill="#333"/><circle cx="49" cy="50" r="3" fill="#333"/><path d="M34 60Q40 64 46 60" stroke="#a55" fill="none"/><text x="40" y="94" font-size="9" text-anchor="middle" fill="#555">NO IMAGE</text></svg>`);
-const FIG='https://static.vocadb.net/img/Artist/mainOrig/36314.png?v=7',med=a=>a.sort((x,y)=>x-y)[a.length>>1];
-const CH=[{n:'Tsuru Kotone',en:'Tsuru Kotone',c:'#2f9a8f',info:['Her voicebank (voicebanks/kotone.zip) is loaded automatically when the page opens.','Profile details have not been added yet.'],bank:null,img:null}];
+const FIG='https://files.catbox.moe/tztm1d.gif',med=a=>a.sort((x,y)=>x-y)[a.length>>1],errs=[];
+const CH=[{n:'No voicebank',en:'',c:'#2f9a8f',info:[],bank:null,img:null}];
 const dec=u=>{try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch{return new TextDecoder('shift_jis').decode(u)}};
 const st=m=>$('#sb').textContent=m;
-function renderChars(){$('#chars').innerHTML=CH.map((c,i)=>`<div class="ch bv${i==cur?' on':''}" data-i="${i}"><img src="${c.img||FIG}" onerror="this.onerror=null;this.src=face('#2f9a8f')"><br>${c.n}<br><small>${c.bank?Object.keys(c.bank.oto).length+' samples':(c.err||'built-in synth')}</small></div>`).join('');
+function renderChars(){$('#chars').innerHTML=CH.map((c,i)=>`<div class="ch bv${i==cur?' on':''}" data-i="${i}"><img src="${c.img||FIG}" onerror="this.onerror=null;this.src=face('#2f9a8f')"><br>${c.n}<br><small>${c.bank?Object.keys(c.bank.oto).length+' samples':(c.err||'no voicebank')}</small></div>`).join('');
 document.querySelectorAll('.ch').forEach(e=>e.onclick=()=>{cur=+e.dataset.i;renderChars();info(cur)})}
-function info(i){const c=CH[i];$('#dl').style.display='block';$('#dl').innerHTML=`<div class="tb"><span>${c.n} - Profile</span><button id="x">×</button></div><div class="bd"><img src="${c.img||FIG}" onerror="this.onerror=null;this.src=face('#2f9a8f')"><div><p><b>${c.n}</b><br>${c.en}</p>${c.info.map(t=>`<p>${t}</p>`).join('')}<p>Voicebank: ${c.bank?'loaded ('+Object.keys(c.bank.oto).length+' samples)':'not loaded (built-in synth)'}</p><button id="lb">Load voicebank .zip...</button><input id="zf" type="file" accept=".zip" hidden></div></div>`;
+function info(i){const c=CH[i];$('#dl').style.display='block';$('#dl').innerHTML=`<div class="tb"><span>Voicebank</span><button id="x">×</button></div><div class="bd"><img src="${c.img||FIG}" onerror="this.onerror=null;this.src=face('#2f9a8f')"><div><p><b>${c.n}</b></p><p>Voicebank: ${c.bank?'loaded ('+Object.keys(c.bank.oto).length+' samples)':'not loaded (built-in synth)'}</p><button id="lb">Load voicebank .zip...</button><input id="zf" type="file" accept=".zip" hidden></div></div>`;
 $('#x').onclick=()=>$('#dl').style.display='none';$('#lb').onclick=()=>$('#zf').click();$('#zf').onchange=e=>e.target.files[0]&&loadBank(i,e.target.files[0])}
 async function loadBank(i,file,quiet){const c=CH[i];st('Loading voicebank...');try{const z=await JSZip.loadAsync(file,{decodeFileName:b=>{try{return new TextDecoder('utf-8',{fatal:true}).decode(new Uint8Array(b))}catch{return new TextDecoder('shift_jis').decode(new Uint8Array(b))}}}),oto={},lc={};let img=null;
 for(const[p,e]of Object.entries(z.files)){if(e.dir)continue;const l=p.toLowerCase();lc[l]=p;
@@ -71,7 +80,7 @@ for(const[p,e]of Object.entries(z.files)){if(e.dir||!/oto\.ini$/i.test(p))contin
 for(const l of dec(await e.async('uint8array')).split(/\r?\n/)){const m=l.match(/^(.+?\.wav)=(.*)$/i);if(!m)continue;const a=m[2].split(',');const al=a[0]||m[1].replace(/\.wav$/i,'');
 if(!oto[al])oto[al]={f:(dir+m[1]).replace(/\\/g,'/').toLowerCase(),o:+a[1]||0,c:+a[2]||0,u:+a[3]||0,p:+a[4]||0}}}
 if(!Object.keys(oto).length)throw'no oto.ini found in zip';
-c.bank={z,oto,lc,cache:{},m:{}};if(img)c.img=img;renderChars();if(quiet!==1)info(i);st(c.n+': loaded '+Object.keys(oto).length+' samples')}catch(x){st('Load failed: '+x);c.err='failed: '+x;renderChars()}}
+c.bank={z,oto,lc,cache:{},m:{}};const ck=Object.keys(lc).find(k=>/character\.txt$/.test(k));let nm='';if(ck){const m=dec(await z.file(lc[ck]).async('uint8array')).match(/^name\s*=\s*(.+)$/mi);if(m)nm=m[1].trim()}c.n=nm||(file.name?file.name.replace(/\.zip$/i,''):c.n);if(img)c.img=img;renderChars();if(quiet!==1)info(i);st(c.n+': loaded '+Object.keys(oto).length+' samples')}catch(x){st('Load failed: '+x);c.err='failed: '+x;renderChars()}}
 const KR='a i u e o ka ki ku ke ko sa shi su se so ta chi tsu te to na ni nu ne no ha hi fu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo n ga gi gu ge go za ji zu ze zo da di du de do ba bi bu be bo pa pi pu pe po kya kyu kyo sha shu sho cha chu cho nya nyu nyo hya hyu hyo mya myu myo rya ryu ryo gya gyu gyo ja ju jo bya byu byo pya pyu pyo'.split(' '),KH=[...'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ',...'きゃきゅきょしゃしゅしょちゃちゅちょにゃにゅにょひゃひゅひょみゃみゅみょりゃりゅりょぎゃぎゅぎょじゃじゅじょびゃびゅびょぴゃぴゅぴょ'.match(/../g)],k2r={},r2k={si:'し',ti:'ち',tu:'つ',hu:'ふ',zi:'じ'};KH.forEach((k,i)=>{k2r[k]=KR[i];r2k[KR[i]]=k});
 const kata=s=>[...s].map(c=>{const k=c.codePointAt(0);return k>=0x3041&&k<=0x3096?String.fromCodePoint(k+96):c}).join('');
 const cands=l0=>{const ly=l0.trim().split(/\s+/).pop()||l0,h=hira(ly),r=k2r[h],k=r2k[ly.toLowerCase()];return [...new Set([l0,ly,h,kata(h),r,k,k&&kata(k)].filter(Boolean))]};
@@ -84,14 +93,15 @@ function f0(buf,t){const d=buf.getChannelData(0),sr=buf.sampleRate,N=1024,mx=Mat
 for(let L=Math.floor(sr/700);L<mx;L++){let a=0,b=0,c=0;for(let i=0;i<N;i++){const x=d[s+i],y=d[s+i+L];a+=x*y;b+=x*x;c+=y*y}const r=a/Math.sqrt(b*c+1e-9);R[L]=r;if(r>best)best=r}
 for(let L=Math.floor(sr/700);L<mx;L++)if(R[L]>=.93*best)return sr/L;return 261.6}
 async function prep(){const b=CH[cur].bank;if(!b)return;for(const n of notes){const e=look(b,n.ly);if(!e||e.buf)continue;const p=b.lc[e.f]||e.f,f=b.z.file(p);if(!f){b.m[n.ly]=null;continue}
-try{if(!b.cache[p])b.cache[p]=await AC.decodeAudioData(await f.async('arraybuffer'));e.buf=b.cache[p];const end=Math.min(e.buf.duration,e.u<0?(e.o-e.u)/1e3:e.buf.duration-e.u/1e3),a=e.o/1e3+e.c/1e3;e.end=end;e.hz=med([.15,.3,.45,.6,.75].map(q=>f0(e.buf,a+q*(end-a))))}catch{b.m[n.ly]=null}}}
+try{if(!b.cache[p])b.cache[p]=await AC.decodeAudioData(await f.async('arraybuffer'));e.buf=b.cache[p];const end=Math.min(e.buf.duration,e.u<0?(e.o-e.u)/1e3:e.buf.duration-e.u/1e3),a=e.o/1e3+e.c/1e3;e.end=end;e.hz=med([.15,.3,.45,.6,.75].map(q=>f0(e.buf,a+q*(end-a))))}catch(x){b.m[n.ly]=null;errs.push('decode: '+x)}}}
 function sched(w){const out=[],b=CH[cur].bank,now=AC.currentTime;for(const n of notes){const sec=60/(tempo*TPQ),st=w+n.t*sec,en=st+n.l*sec,hz=440*2**((n.n-69)/12),g=AC.createGain(),e=b&&look(b,n.ly),vol=n.v/100*(e&&e.buf?.7:2.5);g.connect(AC.destination);let s0=st;
-if(e&&e.buf){const o=e.o/1e3,c=e.c/1e3,p=e.p/1e3,r=Math.max(.2,Math.min(5,hz/(baseHz||e.hz))),a=o+c,ls=a+.4*(e.end-a);s0=Math.max(now,st-p);
-const vs=AC.createBufferSource(),vg=AC.createGain(),vt=Math.max(s0,st+c-p);vs.buffer=e.buf;vs.playbackRate.value=r;vs.loop=e.end-ls>.03;vs.loopStart=ls;vs.loopEnd=e.end;vs.connect(vg);vg.connect(g);vg.gain.setValueAtTime(0,vt);vg.gain.linearRampToValueAtTime(1,vt+.015);vs.start(vt,a);vs.stop(en+.08);out.push(vs);
+if(e&&e.buf){const o=e.o/1e3,c=e.c/1e3,p=e.p/1e3;let r=hz/(baseHz||e.hz);r=isFinite(r)?Math.max(.2,Math.min(5,r)):1;const a=o+c,ls=a+.4*(e.end-a);s0=Math.max(now,st-p);
+try{const vs=AC.createBufferSource(),vg=AC.createGain(),vt=Math.max(s0,st+c-p);vs.buffer=e.buf;vs.playbackRate.value=r;vs.loop=e.end-ls>.03;vs.loopStart=ls;vs.loopEnd=e.end;vs.connect(vg);vg.connect(g);vg.gain.setValueAtTime(0,vt);vg.gain.linearRampToValueAtTime(1,vt+.015);vs.start(vt,a);vs.stop(en+.08);out.push(vs);
 if(c>.005){const cs=AC.createBufferSource(),cg=AC.createGain();cs.buffer=e.buf;cs.connect(cg);cg.connect(g);cg.gain.setValueAtTime(1,s0);cg.gain.setValueAtTime(1,vt);cg.gain.linearRampToValueAtTime(0,vt+.015);cs.start(s0,o,c+.02);out.push(cs)}}
+catch(x){errs.push(String(x));const s=AC.createBufferSource();s.buffer=e.buf;s.playbackRate.value=r;s.connect(g);s.start(s0,o);s.stop(en+.08);out.push(s)}}
 else if(!b){const o=AC.createOscillator();o.type='sawtooth';o.frequency.value=hz;for(const fr of VF[vow(n.ly)]){const q=AC.createBiquadFilter();q.type='bandpass';q.frequency.value=fr;q.Q.value=8;o.connect(q);q.connect(g)}o.start(st);o.stop(en+.08);out.push(o)}
 g.gain.setValueAtTime(0,s0);g.gain.linearRampToValueAtTime(vol,Math.max(s0,st)+.01);g.gain.setValueAtTime(vol,en);g.gain.linearRampToValueAtTime(0,en+.06)}return out}
-async function play(){stop();AC=AC||new AudioContext();await AC.resume();st('Loading samples...');await prep();const bk=CH[cur].bank,ms=bk?[...new Set(notes.filter(n=>{const e=look(bk,n.ly);return !e||!e.buf}).map(n=>n.ly))]:[];END=Math.max(0,...notes.map(n=>n.t+n.l));t0=AC.currentTime+.2;run=sched(t0);st('Playing: '+CH[cur].n+(ms.length?' | no sample found for: '+ms.slice(0,12).join(', '):''));loop()}
+async function play(){errs.length=0;stop();AC=AC||new AudioContext();await AC.resume();st('Loading samples...');await prep();const bk=CH[cur].bank,ms=bk?[...new Set(notes.filter(n=>{const e=look(bk,n.ly);return !e||!e.buf}).map(n=>n.ly))]:[];END=Math.max(0,...notes.map(n=>n.t+n.l));t0=AC.currentTime+.2;run=sched(t0);st(notes.length?'Playing '+notes.length+' notes: '+CH[cur].n+(ms.length?' | no sample found for: '+ms.slice(0,12).join(', '):'')+(errs.length?' | audio error: '+errs[0]:''):'No notes to play - add some, or press Demo melody.');loop()}
 function stop(){if(run){run.forEach(s=>{try{s.stop()}catch{}});run=null}$('#ph').style.left='0px'}
 function loop(){if(!run)return;const tk=(AC.currentTime-t0)*tempo*TPQ/60,x=Math.max(0,tk*px);$('#ph').style.left=x+'px';const sc=$('#sc');if(x>sc.scrollLeft+sc.clientWidth-40)sc.scrollLeft=x-40;if(tk>END+240){stop();st('Stopped')}else requestAnimationFrame(loop)}
 const cv=$('#cv'),g2=cv.getContext('2d');
@@ -117,7 +127,7 @@ $('#sn').onchange=e=>snap=+e.target.value;$('#tp').onchange=e=>tempo=Math.max(30
 $('#zi').onclick=()=>{px=Math.min(.4,px*1.25);draw()};$('#zo').onclick=()=>{px=Math.max(.03,px/1.25);draw()};
 $('#cl').onclick=()=>{if(confirm('Delete all notes?')){notes=[];sel=null;draw()}};
 $('#bp').onclick=play;$('#bs').onclick=()=>{stop();st('Stopped')};$('#bo').onclick=()=>$('#fi').click();
-$('#hp').onclick=()=>alert('Click: add note / Drag: move / Drag right edge: resize\nDouble-click: edit lyric / Right-click or Delete: remove / Space: play\nClick a character on the left for its profile and to load a voicebank .zip (must contain oto.ini).\nLyrics can be hiragana, katakana or romaji (e.g. か / ka); they are matched to the voicebank aliases.\nWithout a voicebank, a built-in formant synth is used.');
+$('#hp').onclick=()=>alert('Click: add note / Drag: move / Drag right edge: resize\nDouble-click: edit lyric / Right-click or Delete: remove / Space: play\nUse Load voicebank .zip to add a voicebank (it must contain oto.ini). Demo melody adds a test tune.\nLyrics can be hiragana, katakana or romaji (e.g. か / ka); they are matched to the voicebank aliases.\nWithout a voicebank, a built-in formant synth is used.');
 // ---- importers
 function midi(b){const d=new DataView(b),tpq=d.getUint16(12),T=[];let p=14;const vl=q=>{let v=0,c;do{c=d.getUint8(q.i++);v=v<<7|c&127}while(c&128);return v};let tempo=0;
 while(p+8<=b.byteLength){const len=d.getUint32(p+4),e=p+8+len,q={i:p+8},n=[],on={};let t=0,rs=0;
@@ -140,16 +150,22 @@ $('#fi').onchange=async e=>{const f=e.target.files[0];if(!f)return;const nm=f.na
 if(/\.midi?$/.test(nm))r=midi(await f.arrayBuffer());else if(nm.endsWith('.ust'))r=ust(dec(new Uint8Array(await f.arrayBuffer())));
 else if(nm.endsWith('.mxl')){const z=await JSZip.loadAsync(f),p=Object.keys(z.files).find(p=>/\.xml$/i.test(p)&&!/^META-INF/i.test(p));r=mxml(dec(await z.file(p).async('uint8array')))}
 else r=mxml(dec(new Uint8Array(await f.arrayBuffer())));
-notes=mono(r.notes);if(r.tempo){tempo=Math.round(r.tempo);$('#tp').value=tempo}sel=null;draw();if(notes.length){const sc=$('#sc');sc.scrollLeft=Math.max(0,notes[0].t*px-20);sc.scrollTop=(HI-1-Math.max(...notes.map(n=>n.n)))*RH-40}
+notes=mono(r.notes);demoOn=0;$('#dm').textContent='Demo melody';if(r.tempo){tempo=Math.round(r.tempo);$('#tp').value=tempo}sel=null;draw();if(notes.length){const sc=$('#sc');sc.scrollLeft=Math.max(0,notes[0].t*px-20);sc.scrollTop=(HI-1-Math.max(...notes.map(n=>n.n)))*RH-40}
 st(f.name+': '+notes.length+' notes (made monophonic)')}catch(x){st('Import failed: '+x)}e.target.value=''};
 keys();renderChars();draw();
-(async()=>{const c=CH[0];c.err='downloading...';renderChars();try{const r=await fetch('voicebanks/kotone.zip');if(!r.ok){c.err='zip not found (HTTP '+r.status+')';renderChars();st('Could not find voicebanks/kotone.zip - use the Voicebank... button instead.');return}
-const bl=await r.blob(),h=new Uint8Array(await bl.slice(0,4).arrayBuffer());if(h[0]!=80||h[1]!=75){c.err='not a zip ('+bl.size+' bytes)';renderChars();return}
-c.err='unpacking '+Math.round(bl.size/1048576)+' MB...';renderChars();await loadBank(0,new File([bl],'kotone.zip'),1);
-if(!c.bank){const e1=c.err;await loadBank(0,new Uint8Array(await bl.arrayBuffer()),1);if(!c.bank)c.err=e1+' | retry: '+c.err}renderChars()}catch(x){c.err='error: '+x;renderChars()}})();
 const NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];$('#bn').innerHTML='<option value="0">Auto</option>'+Array.from({length:37},(_,i)=>{const n=36+i;return `<option value="${n}">${NN[n%12]}${Math.floor(n/12)-1}</option>`}).join('');
 $('#bn').onchange=e=>{const n=+e.target.value;baseHz=n?440*2**((n-69)/12):0};
-$('#bz').onclick=()=>$('#zf2').click();$('#zf2').onchange=e=>e.target.files[0]&&loadBank(0,e.target.files[0]);
+$('#bz').onclick=()=>$('#zf2').click();$('#zf2').onchange=e=>{if(e.target.files[0])loadBank(0,e.target.files[0]);e.target.value=''};
+const SING="kasane teto|adachi rei|defoko|acme iku|yokune ruko|kotone tsuru|matsudappoiyo|haruka nana|momone momo|macne nana|namine ritsu|tsukuyomi sena|toriko|koto fuuga|aino hate|ooka miko|denne hibiki|rook|scott|sukone tei|chitose rifu|munashine bochi|ikiryo shinya|suiren|darashine ena|moene nene|sekka yufu|sou77|suiga sora|elu amaga|xia yu yao|joan|oscar|gahata meiji|shirataki ito|mitani nana|suoyun rila|utanami kazusa|ihiro|momochi minami|asane sana|akeko|mizuo|korone koro|hagane hey|sakurai kaon|amaha sora|ane mone|matsupoid|chono masahiroid|makne nemu|maritsu|nonoshi|fandroid|shion magi|sakane maya|namine dai|mayane makoto|emiri|romippoid|deofairy nol|kazane funa|harune hana|daichi|kujiloid|ka-chanloid|mitsuko|maita|hoshino fumika|erusalem|gekiyaku|kazehiki|baak yatchou|macne coco black|macne coco white|macne petit|whisper angel sasayaki|macne papa|keitai hakken|keitai ron|makune hachi|makne zoe|mackne sae|machi sukio|holica|amahane ruu|nyaonix|kira amai|princess knight riyona|kikyuune aiko|hateloid|utaune nami".split('|'),SB='https://file.garden/ZyUgbYyEhGi7VILo/singxp/';
+const setFig=u=>{const i=$('#fgi');if(u){i.src=u;i.hidden=false}else{i.removeAttribute('src');i.hidden=true}};
+$('#fgi').onerror=()=>{$('#fgi').hidden=true};
+const pkRender=q=>{$('#pkl').innerHTML=SING.filter(n=>n.includes(q.toLowerCase())).map(n=>`<div class="pi" data-n="${n}"><img loading="lazy" src="${SB+encodeURIComponent(n)}.png" onerror="this.parentNode.remove()"><br>${n}</div>`).join('')||'No matches found.'};
+$('#pkl').onclick=e=>{const p=e.target.closest('.pi');if(p)setFig(SB+encodeURIComponent(p.dataset.n)+'.png')};
+$('#pk').onclick=()=>{$('#pkw').hidden=false;$('#pkb').hidden=false;if(!$('#pkl').children.length)pkRender('')};
+$('#pkx').onclick=()=>{$('#pkw').hidden=true;$('#pkb').hidden=true};$('#pkb').onclick=()=>{$('#pkw').hidden=false};
+$('#pks').oninput=e=>pkRender(e.target.value.trim());$('#pkc').onclick=()=>setFig('');
+$('#im').onclick=()=>$('#imf').click();$('#imf').onchange=e=>{const f=e.target.files[0];if(f)setFig(URL.createObjectURL(f));e.target.value=''};
 const tick=()=>$('#clk').textContent=new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});tick();setInterval(tick,3e4);
+st('Welcome to Sing XP! Load a voicebank .zip to begin.');
 $('#sc').scrollTop=(HI-1-72)*RH;
 </script></body></html>
