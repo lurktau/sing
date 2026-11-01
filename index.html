@@ -5,7 +5,7 @@
 html,body{height:100%;margin:0}
 body{font:11px Tahoma,"Segoe UI",Verdana,sans-serif;color:#000;display:flex;flex-direction:column;background:#3a6ea5 url(https://file.garden/ZyUgbYyEhGi7VILo/windowsxplayout/bliss.jpg) center/cover no-repeat fixed}
 #desk{flex:1;display:flex;min-height:0;padding:10px 10px 6px;gap:10px}
-#win,#dl,#pkw{background:#ece9d8;border:3px solid #0850dc;border-top:0;border-radius:8px 8px 0 0;box-shadow:2px 3px 8px rgba(0,0,0,.45)}
+#win,#dl,#pkw,#ld{background:#ece9d8;border:3px solid #0850dc;border-top:0;border-radius:8px 8px 0 0;box-shadow:2px 3px 8px rgba(0,0,0,.45)}
 #win{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
 .tb{background:linear-gradient(#0997ff,#0053ee 8%,#0050ee 40%,#06f 88%,#06f 93%,#005bff 95%,#003dd7);color:#fff;font:bold 13px "Trebuchet MS",Tahoma,sans-serif;text-shadow:1px 1px #0f1089;height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 8px;margin:0 -3px;border-radius:8px 8px 0 0;flex:none}
 .cb,.tb button{display:inline-block;width:21px;height:21px;min-width:0;padding:0;border:1px solid #fff;border-radius:3px;background:#2a62e0;color:#fff;text-align:center;line-height:19px;margin-left:2px;font:bold 12px Tahoma;box-sizing:border-box}
@@ -42,6 +42,11 @@ input,select{font:11px Tahoma,sans-serif;border:1px solid #7f9db9;background:#ff
 #pkl{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;padding:6px;background:#fff;border:1px solid #7f9db9;margin:0 4px 4px;align-content:start}
 .pi{text-align:center;cursor:pointer;border:1px solid #d4d0c8;padding:3px;font-size:10px;text-transform:capitalize}.pi:hover{background:#316ac5;color:#fff}
 .pi img{width:100%;height:110px;object-fit:contain}
+#ov{position:fixed;inset:0;z-index:11}
+#ld{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,92vw);z-index:12}
+.ldb{padding:12px 14px}.ldb p{margin:0 0 10px}
+.pgb{height:16px;border:1px solid #686868;border-radius:3px;padding:2px;background:#fff;box-sizing:content-box}
+#pgf{height:100%;width:0;background:linear-gradient(rgba(255,255,255,.6),rgba(255,255,255,0) 55%,rgba(0,0,0,.15)),repeating-linear-gradient(90deg,#2fc22f 0 8px,transparent 8px 10px)}
 </style></head><body>
 <div id="desk"><div id="win"><div class="tb"><span>Sing XP - Vocal Synthesis System Ver 1.02</span><span><span class="cb">_</span><span class="cb">&#9633;</span><span class="cb x">x</span></span></div>
 <div id="bar">
@@ -53,13 +58,14 @@ Lyric <input id="ly" value="a"> Vol <input id="vl" type="number" value="100" min
 Base pitch <select id="bn" title="If the singing sounds off-key, try other values here"></select>
 <button id="zi">Zoom +</button><button id="zo">Zoom -</button><button id="cl">Clear all</button><button id="bz">Load voicebank .zip</button><input id="zf2" type="file" accept=".zip" hidden><button id="dm">Demo melody</button><button id="im">Image...</button><input id="imf" type="file" accept="image/*" hidden><button id="pk">UTAU gallery...</button><button id="hp">Help</button>
 </div>
-<div class="sunk"><b class="logo">Sing XP</b><marquee scrollamount="3">~*~ Welcome to Sing XP - the easy way to make your PC sing! ~*~ Click the piano roll to add a note ~*~ Right-click to delete ~*~ Double-click to change the lyric ~*~ Copyright (C) 2003 Sing Software ~*~</marquee></div>
+<div class="sunk"><b class="logo">Sing XP</b><marquee scrollamount="3">~*~ Welcome to Sing XP - the easy way to make your PC sing! ~*~ Click the piano roll to add a note ~*~ Right-click to delete ~*~ Double-click to change the lyric ~*~ Copyright (C) 2003 Ikiryo Synth ~*~</marquee></div>
 <div id="main"><div id="chars"></div>
 <div id="roll"><div id="keys"><canvas id="kc"></canvas></div><div id="sc"><div id="wrap"><canvas id="cv"></canvas><div id="ph"></div></div></div></div></div>
 <div id="sb">Ready</div></div>
 <div id="fig"><img id="fgi" alt="" hidden></div></div>
-<div id="task"><button class="st">start</button><div class="tbtn">Sing XP</div><div class="tbtn" id="pkb" hidden>UTAU Gallery</div><div class="tray"><span>Best viewed at 1024x768</span><span id="clk"></span></div></div>
+<div id="task"><button class="st">start</button><div class="tbtn">Sing XP</div><div class="tbtn" id="pkb" hidden>UTAU Gallery</div><div class="tray"><span id="clk"></span></div></div>
 <div id="dl"></div>
+<div id="ov" hidden></div><div id="ld" hidden><div class="tb"><span>Sing XP</span></div><div class="ldb"><p id="ldt">Preparing...</p><div class="pgb"><div id="pgf"></div></div></div></div>
 <div id="pkw" hidden><div class="tb"><span>Choose a Singer Image</span><button id="pkx">x</button></div><div class="pkbar">Search: <input id="pks"> <button id="pkc">No image</button></div><div id="pkl"></div></div>
 <script>
 const $=s=>document.querySelector(s),TPQ=480,LO=24,HI=108,RH=12;
@@ -96,24 +102,37 @@ function per(d,sr,s){const hi=Math.floor(sr/70),lo=Math.floor(sr/800),N=Math.min
 for(let L=lo;L<=hi;L++){let a=0,b=0,c=0;for(let i=0;i<N;i+=2){const x=d[s+i],y=d[s+i+L];a+=x*y;b+=x*x;c+=y*y}R[L]=a/Math.sqrt(b*c+1e-9);if(R[L]>best)best=R[L]}
 for(let L=lo+1;L<hi;L++)if(R[L]>=.88*best&&R[L]>=R[L-1]&&R[L]>=R[L+1]){const y0=R[L-1],y1=R[L],y2=R[L+1],dd=y0-2*y1+y2;return L+(dd?.5*(y0-y2)/dd:0)}return sr/261.6}
 function argpk(d,x0,x1){let b=x0,v=-9;for(let i=Math.max(0,x0);i<Math.min(x1,d.length);i++)if(d[i]>v){v=d[i];b=i}return b}
-function render(e,hz,dur){const B=e.buf,d=B.getChannelData(0),sr=B.sampleRate,o=e.o/1e3,c=e.c/1e3,p=e.p/1e3,T0=baseHz?sr/baseHz:e.T,Tt=sr/hz,i0=Math.round(o*sr),cn=Math.max(0,Math.round(c*sr)),ov=Math.round(.008*sr),vs0=Math.max(0,cn-ov);
-const Lv=Math.max(Math.round(.06*sr),Math.round((p+dur)*sr)-vs0),len=vs0+Lv+Math.round(.06*sr),out=new Float32Array(len);
-for(let i=0;i<cn;i++){const si=i0+i;if(si>=d.length)break;out[i]=d[si]*(i>cn-ov?(cn-i)/ov:1)}
-const rb=Math.min(d.length-2,Math.round(e.end*sr));let ra=Math.round((o+c)*sr);if(rb-ra<5*T0)ra=Math.max(0,rb-Math.ceil(6*T0));
-let m=argpk(d,ra,ra+Math.ceil(T0)),M=[m];for(;;){const x0=Math.round(m+.9*T0),x1=Math.round(m+1.1*T0);if(x1>=rb)break;m=argpk(d,x0,x1);M.push(m)}
-if(M.length<3){M=[];for(let x=ra;x+T0<rb;x+=T0)M.push(Math.round(x))}
-const Lr=Math.max(1,M[M.length-1]-M[0]),avg=Lr/Math.max(1,M.length-1);
-for(let t=0;t<Lv;t+=Tt){let u=t%(2*Lr);if(u>Lr)u=2*Lr-u;const k=Math.min(M.length-1,Math.max(0,Math.round(u/avg))),kk=Math.min(k+1,M.length-1),kb=Math.max(k-1,0),Ts=(M[kk]-M[kb])/(kk-kb||1)||T0,W=Math.max(8,Math.round(Ts)),cen=Math.round(vs0+t),g=Tt/Ts;
-for(let i=-W;i<=W;i++){const si=M[k]+i,oi=cen+i;if(si<0||si>=d.length||oi<0||oi>=len)continue;out[oi]+=d[si]*.5*(1+Math.cos(Math.PI*i/W))*g*(oi<vs0+ov?(oi-vs0+ov)/(2*ov):1)}}
-let sa=0,oa=0;for(let x=ra;x<rb;x++)sa+=d[x]*d[x];sa=Math.sqrt(sa/Math.max(1,rb-ra));for(let x=vs0+ov;x<vs0+Lv;x++)oa+=out[x]*out[x];oa=Math.sqrt(oa/Math.max(1,Lv-ov));const sc=oa>1e-6?Math.min(3,sa/oa):1;for(let x=vs0;x<len;x++)out[x]*=sc;
+function analyze(e,T0){const B=e.buf,d=B.getChannelData(0),sr=B.sampleRate,i0=Math.round(e.o/1e3*sr),ra=Math.round((e.o+e.c)/1e3*sr),rb=Math.min(d.length-2,Math.round(e.end*sr));let a0=ra;if(rb-a0<5*T0)a0=Math.max(0,rb-Math.ceil(6*T0));
+let m=argpk(d,a0,a0+Math.ceil(T0)),F=[m];for(;;){const x0=Math.round(m+.9*T0),x1=Math.round(m+1.1*T0);if(x1>=rb)break;m=argpk(d,x0,x1);F.push(m)}
+if(F.length<3){F=[];for(let x=a0;x+T0<rb;x+=T0)F.push(Math.round(x))}
+const Bk=[];m=F[0];for(;;){const x0=Math.round(m-1.1*T0),x1=Math.round(m-.9*T0);if(x0<i0-T0||x0<0)break;m=argpk(d,x0,x1);Bk.push(m)}
+const ia=Bk.length,M=Bk.reverse().concat(F),hop=Math.max(8,Math.round(T0/2)),nF=Math.ceil((rb-i0)/hop)+1,vf=new Float32Array(nF),Wn=Math.round(1.5*T0);
+for(let f=0;f<nF;f++){const x=i0+f*hop;if(x+Wn+1.1*T0+2>=d.length){vf[f]=1;continue}let best=0;for(let L=Math.round(.92*T0);L<=Math.round(1.08*T0);L++){let a=0,b=0,c=0;for(let i=0;i<Wn;i+=2){const p1=d[x+i],p2=d[x+i+L];a+=p1*p2;b+=p1*p1;c+=p2*p2}const r=b+c>1e-6?a/Math.sqrt(b*c+1e-9):0;if(r>best)best=r}vf[f]=Math.min(1,Math.max(0,(best-.4)/.4))}
+const vs=new Float32Array(nF);for(let f=0;f<nF;f++)vs[f]=(vf[Math.max(0,f-1)]+vf[f]+vf[Math.min(nF-1,f+1)])/3;
+return{T0,M,ia,vf:vs,hop,i0}}
+function render(e,hz,dur){const B=e.buf,d=B.getChannelData(0),sr=B.sampleRate,c=e.c/1e3,p=e.p/1e3,T0=baseHz?sr/baseHz:e.T,Tt=sr/hz;
+if(!e.an||e.an.T0!==T0)e.an=analyze(e,T0);const A=e.an,M=A.M,i0=A.i0,ia=A.ia,cn=Math.max(0,Math.round(c*sr)),rb=Math.min(d.length-2,Math.round(e.end*sr));
+const Lv=Math.max(Math.round(.06*sr),Math.round((p+dur)*sr)-cn),len=cn+Lv+Math.round(.06*sr),ps=new Float32Array(len),rw=new Float32Array(len),
+vAt=x=>A.vf[Math.max(0,Math.min(A.vf.length-1,Math.floor((x-i0)/A.hop)))],Lr=Math.max(1,M[M.length-1]-M[ia]),avg=Lr/Math.max(1,M.length-1-ia),
+near=x=>{let lo=0,hi=M.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(M[mid]<x)lo=mid+1;else hi=mid}return lo>0&&x-M[lo-1]<M[lo]-x?lo-1:lo};
+for(let i=0;i<cn;i++){const si=i0+i;if(si>=d.length)break;rw[i]=d[si]*(1-vAt(si))}
+for(let t=0;t<len-1;t+=Tt){let k,v=1;if(t<cn){const sp=i0+t;k=near(sp);v=vAt(sp)}else{let u=(t-cn)%(2*Lr);if(u>Lr)u=2*Lr-u;k=Math.min(M.length-1,ia+Math.round(u/avg))}
+if(v<.02)continue;const kk=Math.min(k+1,M.length-1),kb=Math.max(k-1,0),Ts=(M[kk]-M[kb])/(kk-kb||1)||T0,W=Math.max(8,Math.round(Ts)),cen=Math.round(t),g=Tt/Ts*v;
+for(let i=-W;i<=W;i++){const si=M[k]+i,oi=cen+i;if(si<0||si>=d.length||oi<0||oi>=len)continue;ps[oi]+=d[si]*.5*(1+Math.cos(Math.PI*i/W))*g}}
+let sa=0,oa=0;for(let x=M[ia];x<rb;x++)sa+=d[x]*d[x];sa=Math.sqrt(sa/Math.max(1,rb-M[ia]));for(let x=cn;x<cn+Lv;x++)oa+=ps[x]*ps[x];oa=Math.sqrt(oa/Lv);const sc=oa>1e-6?Math.min(3,sa/oa):1,fi=Math.round(.003*sr),out=new Float32Array(len);
+for(let x=0;x<len;x++)out[x]=(ps[x]*sc+rw[x])*(x<fi?x/fi:1);
 const buf=AC.createBuffer(1,len,sr);buf.copyToChannel(out,0);return buf}
-async function prep(){const b=CH[cur].bank;if(!b)return;for(const n of notes){const e=look(b,n.ly);if(!e||e.buf)continue;const p=b.lc[e.f]||e.f,f=b.z.file(p);if(!f){b.m[n.ly]=null;continue}
-try{if(!b.cache[p])b.cache[p]=await AC.decodeAudioData(await f.async('arraybuffer'));e.buf=b.cache[p];const end=Math.min(e.buf.duration,e.u<0?(e.o-e.u)/1e3:e.buf.duration-e.u/1e3),a=e.o/1e3+e.c/1e3;e.end=end;const dd=e.buf.getChannelData(0),sr=e.buf.sampleRate;e.T=med([.15,.3,.45,.6,.75].map(q=>per(dd,sr,Math.floor((a+q*(end-a))*sr))));e.hz=sr/e.T}catch(x){b.m[n.ly]=null;errs.push('decode: '+x)}}}
+const yld=()=>new Promise(r=>setTimeout(r,0));
+async function prep(pr){const b=CH[cur].bank;if(!b)return;const U=[...new Set(notes.map(n=>look(b,n.ly)).filter(Boolean))],tot=U.length+notes.length,bad=e=>{for(const a in b.m)if(b.m[a]===e)b.m[a]=null};let k=0;
+for(const e of U){pr&&pr(k/tot,'Analyzing sample '+(k+1)+' of '+U.length+'...');await yld();if(!e.buf){const p=b.lc[e.f]||e.f,f=b.z.file(p);if(!f){bad(e);k++;continue}
+try{if(!b.cache[p])b.cache[p]=await AC.decodeAudioData(await f.async('arraybuffer'));e.buf=b.cache[p];const end=Math.min(e.buf.duration,e.u<0?(e.o-e.u)/1e3:e.buf.duration-e.u/1e3),a=e.o/1e3+e.c/1e3;e.end=end;const dd=e.buf.getChannelData(0),sr=e.buf.sampleRate;e.T=med([.15,.3,.45,.6,.75].map(q=>per(dd,sr,Math.floor((a+q*(end-a))*sr))));e.hz=sr/e.T}catch(x){bad(e);errs.push('decode: '+x)}}k++}
+const sec=60/(tempo*TPQ);for(const n of notes){pr&&pr(k/tot,'Shaping note '+(k-U.length+1)+' of '+notes.length+'...');const e=look(b,n.ly);if(e&&e.buf){const hz=440*2**((n.n-69)/12),key=hz+'|'+n.l*sec+'|'+baseHz;if(n._k!==key||n._e!==e){try{n._r=render(e,hz,n.l*sec);n._k=key;n._e=e}catch(x){errs.push(String(x))}}}k++;if(k%2==0)await yld()}}
+const ldShow=()=>{$('#ov').hidden=false;$('#ld').hidden=false;ldSet(0,'Preparing...')},ldSet=(f,t)=>{$('#pgf').style.width=Math.round(f*100)+'%';if(t)$('#ldt').textContent=t},ldHide=()=>{$('#ov').hidden=true;$('#ld').hidden=true};
 function sched(w){const out=[],b=CH[cur].bank,now=AC.currentTime;for(const n of notes){const sec=60/(tempo*TPQ),st=w+n.t*sec,en=st+n.l*sec,hz=440*2**((n.n-69)/12),g=AC.createGain(),e=b&&look(b,n.ly),vol=n.v/100*(e&&e.buf?.7:2.5);g.connect(AC.destination);let s0=st;
-if(e&&e.buf){const bs=st-e.p/1e3;s0=Math.max(now,bs);try{const sr=AC.createBufferSource();sr.buffer=render(e,hz,en-st);sr.connect(g);sr.start(s0,Math.max(0,now-bs));sr.stop(en+.08);out.push(sr)}catch(x){errs.push(String(x))}}
+if(e&&e.buf){const bs=st-e.p/1e3;s0=Math.max(now,bs);try{const sr=AC.createBufferSource();sr.buffer=(n._k===hz+'|'+n.l*sec+'|'+baseHz&&n._e===e&&n._r)||render(e,hz,n.l*sec);sr.connect(g);sr.start(s0,Math.max(0,now-bs));sr.stop(en+.08);out.push(sr)}catch(x){errs.push(String(x))}}
 else if(!b){const o=AC.createOscillator();o.type='sawtooth';o.frequency.value=hz;for(const fr of VF[vow(n.ly)]){const q=AC.createBiquadFilter();q.type='bandpass';q.frequency.value=fr;q.Q.value=8;o.connect(q);q.connect(g)}o.start(st);o.stop(en+.08);out.push(o)}
 g.gain.setValueAtTime(0,s0);g.gain.linearRampToValueAtTime(vol,e&&e.buf?s0+.004:Math.max(s0,st)+.01);g.gain.setValueAtTime(vol,en);g.gain.linearRampToValueAtTime(0,en+.06)}return out}
-async function play(){errs.length=0;stop();AC=AC||new AudioContext();await AC.resume();st('Loading samples...');await prep();const bk=CH[cur].bank,fe=bk&&notes.map(n=>look(bk,n.ly)).find(e=>e&&e.hz),ms=bk?[...new Set(notes.filter(n=>{const e=look(bk,n.ly);return !e||!e.buf}).map(n=>n.ly))]:[];END=Math.max(0,...notes.map(n=>n.t+n.l));t0=AC.currentTime+.2;run=sched(t0);st(notes.length?'Playing '+notes.length+' notes: '+CH[cur].n+(ms.length?' | no sample found for: '+ms.slice(0,12).join(', '):'')+(errs.length?' | audio error: '+errs[0]:'')+(fe?' | detected voice pitch '+nm2(fe.hz)+' (use Base pitch if off-key)':''):'No notes to play - add some, or press Demo melody.');loop()}
+async function play(){errs.length=0;stop();AC=AC||new AudioContext();await AC.resume();const t00=Date.now(),useL=CH[cur].bank&&notes.length;if(useL)ldShow();st('Analyzing samples...');try{await prep(ldSet)}catch(x){errs.push(String(x))}if(useL){ldSet(1,'Done!');const w=1200-(Date.now()-t00);if(w>0)await new Promise(r=>setTimeout(r,w));ldHide()}const bk=CH[cur].bank,fe=bk&&notes.map(n=>look(bk,n.ly)).find(e=>e&&e.hz),ms=bk?[...new Set(notes.filter(n=>{const e=look(bk,n.ly);return !e||!e.buf}).map(n=>n.ly))]:[];END=Math.max(0,...notes.map(n=>n.t+n.l));t0=AC.currentTime+.2;run=sched(t0);st(notes.length?'Playing '+notes.length+' notes: '+CH[cur].n+(ms.length?' | no sample found for: '+ms.slice(0,12).join(', '):'')+(errs.length?' | audio error: '+errs[0]:'')+(fe?' | detected voice pitch '+nm2(fe.hz)+' (use Base pitch if off-key)':''):'No notes to play - add some, or press Demo melody.');loop()}
 function stop(){if(run){run.forEach(s=>{try{s.stop()}catch{}});run=null}$('#ph').style.left='0px'}
 function loop(){if(!run)return;const tk=(AC.currentTime-t0)*tempo*TPQ/60,x=Math.max(0,tk*px);$('#ph').style.left=x+'px';const sc=$('#sc');if(x>sc.scrollLeft+sc.clientWidth-40)sc.scrollLeft=x-40;if(tk>END+240){stop();st('Stopped')}else requestAnimationFrame(loop)}
 const cv=$('#cv'),g2=cv.getContext('2d');
