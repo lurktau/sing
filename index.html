@@ -26,7 +26,7 @@ input,select{font:11px Tahoma,sans-serif;border:1px solid #7f9db9;background:#ff
 #sb{padding:3px 6px;border-top:1px solid #aca899;flex:none}
 #fig{width:clamp(0px,26vw,340px);flex:none;pointer-events:none}
 #fig img{width:100%;height:100%;object-fit:contain;object-position:bottom;opacity:.95;filter:drop-shadow(2px 3px 4px rgba(0,0,0,.35))}
-@media(max-width:800px){#fig{display:none}}
+@media(max-width:900px){#fig{display:none}}
 #dl{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,92vw);z-index:9}
 #dl .bd{padding:8px;display:flex;gap:10px}#dl img{width:120px;height:170px;object-fit:cover;object-position:top;border:1px solid #7f9db9;background:#fff}
 #dl p{margin:0 0 6px;line-height:1.45}
@@ -75,11 +75,27 @@ button.on{background:#316ac5!important;color:#fff!important}
 .kn b{display:block;font-weight:normal}.kv{color:#555;font-size:10px}.gl{border-top:2px solid #777;margin:4px 4px 0;padding-top:2px;font-size:10px}.gl.nb{border-top-color:transparent}
 .kfoot{margin-top:10px;color:#444;font-size:10px}.kfoot button{float:right}
 #rul{display:flex;height:16px;flex:none;border:1px solid #7f9db9;border-bottom:0;background:#d6d2bf}#rk{width:48px;flex:none}#rsc{flex:1;overflow:hidden;cursor:pointer}#rcv{display:block}
+html{-webkit-text-size-adjust:100%}#cv,#lc,#rcv{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}button,.m{touch-action:manipulation}
+@media (max-width:760px){
+html,body{overflow:hidden}body{font-size:13px}#desk{padding:0;gap:0}#win{margin:0;border-left-width:2px;border-right-width:2px;border-radius:0}
+.tb{height:24px;font-size:12px}#mb{overflow-x:auto}#mb .m{padding:9px 8px}
+#bar{flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:6px;-webkit-overflow-scrolling:touch}#bar>*{flex:none}
+button,input,select{font-size:14px;min-height:32px}#bar input[type=number]{width:58px}#ly{width:64px}
+.sunk{display:none}
+#main{flex-direction:column;padding:2px;gap:2px}
+#chars{width:auto;flex:none;display:flex;flex-direction:row;padding:2px;overflow:hidden}
+.ch{display:flex;align-items:center;gap:10px;text-align:left;padding:2px 8px;width:100%}.ch img{width:34px;height:44px;flex:none}.ch br{display:none}
+#rollc{min-height:0}
+.dd button{padding:10px 24px 10px 22px}.dd .sub>.dd{position:static;max-height:none;box-shadow:none;border:0;padding-left:12px;min-width:0}
+#pkw,#sw,#vw,#dl{width:94vw}#pkl{grid-template-columns:repeat(auto-fill,minmax(78px,1fr))}.pi img{height:90px}
+#bal{max-width:62vw}#clip{left:8px}
+#task .tbtn{min-width:0;padding:4px 8px}}
+@media (max-height:520px){#desk{padding:0;gap:0}#win{margin:0;border-radius:0}#fig{display:none}.tb{display:none}.sunk{display:none}#lane{display:none}#bar{padding:3px}#sb{padding:1px 6px}#chars{display:none}#mb .m{padding:5px 10px}#task{height:26px}}
 </style></head><body>
 <div id="desk"><div id="win"><div class="tb"><span>Sing XP - Vocal Synthesis System Ver 1.02</span><span><span class="cb">_</span><span class="cb">&#9633;</span><span class="cb x">x</span></span></div>
 <div id="mb">
 <span class="m" id="m-file">File<div class="dd"><button id="bo">Open song / project file...</button><button id="bz">Load voicebank .zip...</button><hr><div class="sub"><div class="sh">Export</div><div class="dd"><button id="ew">Vocal track (.wav)</button><button id="eu">UST (.ust)</button><button id="em">MIDI (.mid)</button></div></div><hr><button id="sbtn">Settings...</button></div></span>
-<span class="m" id="m-edit">Edit<div class="dd"><button id="ud">Undo (Ctrl+Z)</button><hr><button id="pbx">Clear all pitch bends</button><button id="va">Add vibrato to all notes</button><button id="vx">Remove all vibrato</button><hr><button id="cl">Clear all notes</button></div></span>
+<span class="m" id="m-edit">Edit<div class="dd"><button id="ud">Undo (Ctrl+Z)</button><button id="dsel">Delete selected note</button><hr><button id="pbx">Clear all pitch bends</button><button id="va">Add vibrato to all notes</button><button id="vx">Remove all vibrato</button><hr><button id="cl">Clear all notes</button></div></span>
 <span class="m" id="m-view">View<div class="dd"><button id="zi">Zoom in</button><button id="zo">Zoom out</button><hr><button id="tpc">Pitch curves: on</button><button id="tvl">Volume lane: on</button></div></span>
 <span class="m" id="m-song">Song<div class="dd" id="dmenu"><div class="hd">Demo melodies</div></div></span>
 <span class="m" id="m-voice">Voice<div class="dd"><button id="vo">Voice panel...</button></div></span>
@@ -122,7 +138,7 @@ Base pitch <select id="bn" title="If the singing sounds off-key, try other value
 <div id="pkw" hidden><div class="tb"><span>Choose a Singer Image</span><button id="pkx">x</button></div><div class="pkbar">Search: <input id="pks"> <button id="pkc">No image</button></div><div id="pkl"></div></div>
 <script>
 const $=s=>document.querySelector(s),TPQ=480,LO=24,HI=108,RH=12;
-let NC={n:'#3a78d8',t:'#fff',sel:'#ffd84a',rw:'#fff',rb:'#d4d4e0',l1:'#808080',l2:'#e0e0e0',bt:'#000',bl:'#606060',bm:'#b0b0b0',rl:'#d6d2bf',rt:'#000',cur:'#1a5fd0',kw:'#fff',kb:'#000',kl:'#808080',kt:'#000',style:'xp',rows:null,lb:null,ln:null,lg:null},S={defLen:480,auto:1,lyr:1,pit:1,vlane:1,minLoad:1200,theme:0,skin:''},VP={tr:0,po:0,fs:0,hu:0,vd:0,vr:5.5,vy:.3,vol:100},pbMode=0,pdraw=null,ldrag=null,startTick=0,pausedTick=null,fromTick=0,notes=[],tempo=120,snap=120,px=.1,sel=null,cur=0,AC=null,run=null,t0=0,drag=null,END=0,baseHz=0;
+let TCH=0,NC={n:'#3a78d8',t:'#fff',sel:'#ffd84a',rw:'#fff',rb:'#d4d4e0',l1:'#808080',l2:'#e0e0e0',bt:'#000',bl:'#606060',bm:'#b0b0b0',rl:'#d6d2bf',rt:'#000',cur:'#1a5fd0',kw:'#fff',kb:'#000',kl:'#808080',kt:'#000',style:'xp',rows:null,lb:null,ln:null,lg:null},S={defLen:480,auto:1,lyr:1,pit:1,vlane:1,minLoad:1200,theme:0,skin:''},VP={tr:0,po:0,fs:0,hu:0,vd:0,vr:5.5,vy:.3,vol:100},pbMode=0,pdraw=null,ldrag=null,startTick=0,pausedTick=null,fromTick=0,notes=[],tempo=120,snap=120,px=.1,sel=null,cur=0,AC=null,run=null,t0=0,drag=null,END=0,baseHz=0;
 const face=(c,h)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><rect width="80" height="100" fill="#dde"/><circle cx="40" cy="48" r="22" fill="#fde"/><path d="M16 56Q16 14 40 14Q64 14 64 56L58 56Q56 30 40 30Q24 30 22 56Z" fill="${c}"/><circle cx="31" cy="50" r="3" fill="#333"/><circle cx="49" cy="50" r="3" fill="#333"/><path d="M34 60Q40 64 46 60" stroke="#a55" fill="none"/><text x="40" y="94" font-size="9" text-anchor="middle" fill="#555">NO IMAGE</text></svg>`);
 const FIG='https://files.catbox.moe/tztm1d.gif',med=a=>a.sort((x,y)=>x-y)[a.length>>1],errs=[];
 const CH=[{n:'No voicebank',en:'',c:'#2f9a8f',info:[],bank:null,img:null}];
@@ -221,7 +237,7 @@ function keys(){const k=$('#kc'),c=k.getContext('2d');k.width=48;k.height=(HI-LO
 const clash=n=>notes.some(m=>m!==n&&n.t<m.t+m.l&&m.t<n.t+n.l),pos=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]},at=(t,nn)=>notes.find(m=>t>=m.t&&t<m.t+m.l&&m.n==nn);
 cv.onmousedown=e=>{if(e.button)return;const[x,y]=pos(e),t=x/px,nn=HI-1-Math.floor(y/RH);let n=at(t,nn),mode='m';
 if(pbMode){const nt=notes.find(m=>t>=m.t&&t<=m.t+m.l);if(nt){pushUndo();pdraw={n:nt};pbAdd(nt,x,y);draw()}return}
-pushUndo();if(n){if((n.t+n.l-t)*px<6)mode='r'}else{const s=Math.floor(t/snap)*snap;n={t:s,l:snap,n:nn,ly:$('#ly').value||'a',v:+$('#vl').value||100};if(clash(n))return;for(let l=S.defLen;l>snap;l-=snap){n.l=l;if(!clash(n))break;n.l=snap}notes.push(n)}
+pushUndo();if(n){if((n.t+n.l-t)*px<(TCH?18:6))mode='r'}else{const s=Math.floor(t/snap)*snap;n={t:s,l:snap,n:nn,ly:$('#ly').value||'a',v:+$('#vl').value||100};if(clash(n))return;for(let l=S.defLen;l>snap;l-=snap){n.l=l;if(!clash(n))break;n.l=snap}notes.push(n)}
 sel=n;$('#ly').value=n.ly;$('#vl').value=n.v;$('#vd').value=n.vb?n.vb[2]:0;$('#vr').value=n.vb?Math.round(10000/n.vb[1])/10:5.5;drag={n,mode,dx:t-n.t};draw()};
 window.onmousemove=e=>{if(pdraw){const[x,y]=pos(e);pbAdd(pdraw.n,x,y);draw();return}if(!drag)return;const[x,y]=pos(e),t=x/px,n=drag.n,o={t:n.t,l:n.l,n:n.n};
 if(drag.mode=='m'){n.t=Math.max(0,Math.round((t-drag.dx)/snap)*snap);n.n=Math.max(LO,Math.min(HI-1,HI-1-Math.floor(y/RH)))}else n.l=Math.max(snap,Math.round((t-n.t)/snap)*snap);
@@ -402,5 +418,16 @@ $('#vrst').onclick=()=>document.querySelectorAll('.kn').forEach(el=>kset(el,KN.f
 try{Object.assign(S,JSON.parse(localStorage.getItem('singxp')||'{}'))}catch{}
 $('#s-len').value=S.defLen;$('#s-auto').checked=!!S.auto;$('#s-lyr').checked=!!S.lyr;$('#s-pit').checked=!!S.pit;$('#s-vl').checked=!!S.vlane;$('#s-min').value=S.minLoad/1e3;applyLook();
 
+/* ---- touch support (phones/tablets) ---- */
+(function(){let on=0,lp=null,mv=0,sx=0,sy=0;const P=t=>({button:0,clientX:t.clientX,clientY:t.clientY,preventDefault(){}}),rect=()=>cv.getBoundingClientRect();
+cv.addEventListener('touchstart',e=>{if(e.touches.length>1)return;TCH=1;const t=e.touches[0],r=rect(),x=t.clientX-r.left,y=t.clientY-r.top,tk=x/px;const hit=notes.find(m=>tk>=m.t&&tk<m.t+m.l&&m.n==HI-1-Math.floor(y/RH)),span=notes.some(m=>tk>=m.t&&tk<=m.t+m.l);
+if((pbMode&&span)||hit){e.preventDefault();on=1;mv=0;sx=t.clientX;sy=t.clientY;cv.onmousedown(P(t));if(!pbMode)lp=setTimeout(()=>{if(on&&!mv){on=0;window.onmouseup();cv.oncontextmenu(P(t));st('Note deleted (Edit > Undo brings it back).')}},700)}},{passive:false});
+cv.addEventListener('touchmove',e=>{if(!on)return;e.preventDefault();const t=e.touches[0];if(Math.abs(t.clientX-sx)+Math.abs(t.clientY-sy)>8){mv=1;clearTimeout(lp)}window.onmousemove(P(t))},{passive:false});
+const end=()=>{if(on){on=0;clearTimeout(lp);window.onmouseup()}};cv.addEventListener('touchend',end);cv.addEventListener('touchcancel',end);
+const lt=e=>{const t=e.touches[0],r=lc.getBoundingClientRect();return[t.clientX-r.left,t.clientY-r.top]};
+lc.addEventListener('touchstart',e=>{const[x,y]=lt(e),tk=x/px,n=notes.find(m=>tk>=m.t&&tk<m.t+m.l);if(!n)return;e.preventDefault();pushUndo();sel=n;ldrag=n;setV(n,y);draw()},{passive:false});
+lc.addEventListener('touchmove',e=>{if(ldrag){e.preventDefault();setV(ldrag,lt(e)[1])}},{passive:false});lc.addEventListener('touchend',()=>{if(ldrag){ldrag=null;draw()}});
+document.querySelectorAll('.kn').forEach(el=>{const k=KN.find(x=>x[0]==el.dataset.p);let kon=0,y0=0,v0=0;el.querySelector('.kd').addEventListener('touchstart',e=>{kon=1;y0=e.touches[0].clientY;v0=VP[k[0]];e.preventDefault()},{passive:false});window.addEventListener('touchmove',e=>{if(kon){e.preventDefault();kset(el,v0+(y0-e.touches[0].clientY)/150*(k[3]-k[2]))}},{passive:false});window.addEventListener('touchend',()=>{kon=0})});
+$('#dsel').onclick=()=>{if(sel){pushUndo();notes=notes.filter(m=>m!==sel);sel=null;draw();st('Note deleted.')}else st('Tap a note first, then choose Delete selected note.')}})();
 $('#sc').scrollTop=(HI-1-72)*RH;
 </script></body></html>
